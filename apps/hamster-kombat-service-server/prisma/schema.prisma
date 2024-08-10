@@ -1,0 +1,53 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Payment {
+  id        String             @id @default(cuid())
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  amount    Float?
+  status    EnumPaymentStatus?
+  session   Session?           @relation(fields: [sessionId], references: [id])
+  sessionId String?
+  user      User?              @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Session {
+  id            String                    @id @default(cuid())
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+  sessionStatus EnumSessionSessionStatus?
+  sessionName   String?
+  payments      Payment[]
+  user          User?                     @relation(fields: [userId], references: [id])
+  userId        String?
+}
+
+model User {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  firstName String?
+  lastName  String?
+  username  String    @unique
+  email     String?   @unique
+  password  String
+  roles     Json
+  sessions  Session[]
+  payments  Payment[]
+}
+
+enum EnumPaymentStatus {
+  Option1
+}
+
+enum EnumSessionSessionStatus {
+  Option1
+}
